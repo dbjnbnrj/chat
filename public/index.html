@@ -1,44 +1,46 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>OTR IM</title>
-	<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>OTR IM Chat</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-<ul class="pages">
-	<li class="chat page">
-		<div class="chatArea">
-		<ul class="messages">
-			<div class="otrArea">
-				<div>Encryption State: <span class="encryption_state">0</span><button class="encrypt">Encrypt</button></div><br/>
-				<div>Trust State: <span class="trust_state">false</span><button class="verify">Verify</button></div>
-			</div>
-		</ul>
-		</div>
-		<input class="inputMessage" placeholder="Type here..."/>
-	</li>
-	
-	<li class="login page">
-		<div class="form">
-		<h3 class="title">What's your nickname?</h3>
-		<input class="usernameInput" type="text" maxlength="14" />
-		</div>
-	</li>
-</ul>
+    
+    <li class="chat page">
+      <div class="otrArea">
+        <label id="eState">Unencrypted</label>
+        <button id="eButton">Encrypt</button>
 
-<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/main.js"></script>
+        <label id="vState">Unverified</label>
+        <button id="vButton">Verify</button>
+      </div>
+      <div class="chatArea">
+        <ul class="messages"></ul>
+      </div>
+      <input class="inputMessage" placeholder="Type here..."/>
+    </li>
+    
+    <li class="login page">
+      <div class="form">
+        <h3 class="title">What's your nickname?</h3>
+        <input class="usernameInput" type="text" maxlength="14" />
+      </div>
+    </li>
+  </ul>
 
-<script src="/js/salsa20.js"></script>
-<script src="/js/bigint.js"></script>
-<script src="/js/crypto.js"></script>
-<script src="/build/dep/eventemitter.js"></script>
+  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/main.js"></script>
 
-<script src="/js/otr.js"></script>
+  <!-- Load dependencies -->
+  <script src="build/dep/salsa20.js"></script>
+  <script src="build/dep/bigint.js"></script>
+  <script src="build/dep/crypto.js"></script>
+  <script src="build/dep/eventemitter.js"></script>
+
+  <!-- Load otr.js or otr.min.js -->
+  <script src="build/otr.js"></script>
 
 </body>
-
 </html>

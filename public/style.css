@@ -109,30 +109,6 @@ ul {
   text-align: center;
 }
 
-.otrArea {
-  position:absolute;
-  top:0;
-  right:0;
-}
-
-.otrButton {
-  background-color: #E48681;
-  border-color: rgba(0,0,0,0.3);
-  text-shadow: 0 1px 0 rgba(0,0,0,0.5);
-  color: #FFF;
-}
-
-.otrButton:hover {
-    background-color: #DA4F49;
-    border-color: rgba(0,0,0,0.5);
-}
-  
-.otrButton:active {
-    background-color: #B32C24;
-    border-color: rgba(0,0,0,0.9);
-}
-
-
 /* Messages */
 
 .chatArea {
@@ -171,4 +147,9 @@ ul {
   position: absolute;
   right: 0;
   width: 100%;
+}
+
+/* OTR Area */
+.otrArea{
+  
 }

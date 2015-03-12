@@ -1,4 +1,9 @@
-$(function() {
+$(
+
+  function() {
+  
+  var start = null;
+
   var FADE_TIME = 150; // ms
   var TYPING_TIMER_LENGTH = 400; // ms
   var COLORS = [
@@ -19,25 +24,21 @@ $(function() {
   // Prompt for setting a username
   var username;
   var connected = false;
-  var typing = false;
-  var lastTypingTime;
   var $currentInput = $usernameInput.focus();
 
   var socket = io('http://localhost:3000');
 
-  function addParticipantsMessage (data) {
-    var message = '';
-    if (data.numUsers === 1) {
-      message += "there's 1 participant";
-    } else {
-      message += "there are " + data.numUsers + " participants";
-    }
-    log(message);
-  }
+  // OTR Messaging
+  var buddy = new OTR();
+  
+  var $encryptButton = $('#eButton');
+  var $encryptionState = $('#eState');
+  var $verifyButton = $('#vButton');
+  var $verifyState = $('#vState');
 
   // Sets the client's username
   function setUsername () {
-    username = cleanInput($usernameInput.val().trim());
+    username = $usernameInput.val().trim();
 
     // If the username is valid
     if (username) {
@@ -50,74 +51,23 @@ $(function() {
       socket.emit('add user', username);
     }
   }
-
-  // Sends a chat message
-  function sendMessage () {
-    var message = $inputMessage.val();
-    // Prevent markup from being injected into the message
-    message = cleanInput(message);
-    // if there is a non-empty message and a socket connection
-    if (message && connected) {
-      $inputMessage.val('');
-      addChatMessage({
-        username: username,
-        message: message
-      });
-      // tell server to execute 'new message' and send along one parameter
-      socket.emit('new message', message);
-    }
-  }
-
-  // Log a message
-  function log (message, options) {
-    var $el = $('<li>').addClass('log').text(message);
-    addMessageElement($el, options);
-  }
-
+  
   // Adds the visual chat message to the message list
   function addChatMessage (data, options) {
-    // Don't fade the message in if there is an 'X was typing'
-    var $typingMessages = getTypingMessages(data);
-    options = options || {};
-    if ($typingMessages.length !== 0) {
-      options.fade = false;
-      $typingMessages.remove();
-    }
-
+  
     var $usernameDiv = $('<span class="username"/>')
       .text(data.username)
       .css('color', getUsernameColor(data.username));
     var $messageBodyDiv = $('<span class="messageBody">')
       .text(data.message);
 
-    var typingClass = data.typing ? 'typing' : '';
     var $messageDiv = $('<li class="message"/>')
       .data('username', data.username)
-      .addClass(typingClass)
       .append($usernameDiv, $messageBodyDiv);
 
     addMessageElement($messageDiv, options);
   }
 
-  // Adds the visual chat typing message
-  function addChatTyping (data) {
-    data.typing = true;
-    data.message = 'is typing';
-    addChatMessage(data);
-  }
-
-  // Removes the visual chat typing message
-  function removeChatTyping (data) {
-    getTypingMessages(data).fadeOut(function () {
-      $(this).remove();
-    });
-  }
-
-  // Adds a message element to the messages and scrolls to the bottom
-  // el - The element to add as a message
-  // options.fade - If the element should fade-in (default = true)
-  // options.prepend - If the element should prepend
-  //   all other messages (default = false)
   function addMessageElement (el, options) {
     var $el = $(el);
 
@@ -144,36 +94,27 @@ $(function() {
     $messages[0].scrollTop = $messages[0].scrollHeight;
   }
 
-  // Prevents input from having injected markup
-  function cleanInput (input) {
-    return $('<div/>').text(input).text();
-  }
 
-  // Updates the typing event
-  function updateTyping () {
-    if (connected) {
-      if (!typing) {
-        typing = true;
-        socket.emit('typing');
-      }
-      lastTypingTime = (new Date()).getTime();
+  // Sends a chat message
+  function sendMessage () {
+    
+    var message = $inputMessage.val();
 
-      setTimeout(function () {
-        var typingTimer = (new Date()).getTime();
-        var timeDiff = typingTimer - lastTypingTime;
-        if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
-          socket.emit('stop typing');
-          typing = false;
-        }
-      }, TYPING_TIMER_LENGTH);
+    // if there is a non-empty message and a socket connection
+    if (message && connected) {
+      $inputMessage.val('');
+      addChatMessage({
+        username: username,
+        message: message
+      });
+      buddy.sendMsg(message);
     }
   }
 
-  // Gets the 'X is typing' messages of a user
-  function getTypingMessages (data) {
-    return $('.typing.message').filter(function (i) {
-      return $(this).data('username') === data.username;
-    });
+  // Log a message
+  function log (message, options) {
+    var $el = $('<li>').addClass('log').text(message);
+    addMessageElement($el, options);
   }
 
   // Gets the color of a username through our hash function
@@ -191,25 +132,16 @@ $(function() {
   // Keyboard events
 
   $window.keydown(function (event) {
-    // Auto-focus the current input when a key is typed
-    if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-      $currentInput.focus();
-    }
     // When the client hits ENTER on their keyboard
     if (event.which === 13) {
       if (username) {
         sendMessage();
-        socket.emit('stop typing');
-        typing = false;
       } else {
         setUsername();
       }
     }
   });
 
-  $inputMessage.on('input', function() {
-    updateTyping();
-  });
 
   // Click events
 
@@ -218,10 +150,6 @@ $(function() {
     $currentInput.focus();
   });
 
-  // Focus input when clicking on the message input's border
-  $inputMessage.click(function () {
-    $inputMessage.focus();
-  });
 
   // Socket events
 
@@ -233,34 +161,91 @@ $(function() {
     log(message, {
       prepend: true
     });
-    addParticipantsMessage(data);
+   // addParticipantsMessage(data);
   });
 
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
-    addChatMessage(data);
+      console.log('incoming', data);
+      addChatMessage(data);
+      buddy.receiveMsg(data.message);
   });
 
   // Whenever the server emits 'user joined', log it in the chat body
   socket.on('user joined', function (data) {
     log(data.username + ' joined');
-    addParticipantsMessage(data);
   });
 
   // Whenever the server emits 'user left', log it in the chat body
   socket.on('user left', function (data) {
     log(data.username + ' left');
-    addParticipantsMessage(data);
-    removeChatTyping(data);
   });
 
-  // Whenever the server emits 'typing', show the typing message
-  socket.on('typing', function (data) {
-    addChatTyping(data);
+
+  // Buddy Events
+  buddy.on('ui', function (msg, encrypted) {
+    console.log("Msg is ",msg);
   });
 
-  // Whenever the server emits 'stop typing', kill the typing message
-  socket.on('stop typing', function (data) {
-    removeChatTyping(data);
+  buddy.on('io', function (msg) {
+    console.log("outgoing: " + msg);
+    socket.emit('new message', msg);
   });
+
+  buddy.on('status', function (state) {
+    
+    if (state === OTR.CONST.STATUS_AKE_SUCCESS) {
+    log('ake took ' + ((new Date()).getTime() - start) + 'ms ');
+    log('<br />message state is ' + (buddy.msgstate ? 'encrypted' : 'plaintext' ) + '</strong>');
+    $('#eState').text(buddy.msgstate);
+    }
+
+    if(state  == OTR.CONST.STATUS_END_OTR){
+      log('ake has ended');
+    }
+
+  });
+
+  buddy.on('smp', function (type, data) {
+      
+      switch (type) {
+      case 'question':
+      {
+        var secret = prompt(" Bob wants to verify you using the socialist millionaire protocol. The question is '"+data+"'");
+        buddy.smpSecret(secret);
+        break
+      }
+
+      case 'trust':
+      {
+        console.log(data);
+        $('#vState').text(buddy.trust);
+        if (buddy.trust) {
+        alert('trust established');
+        }
+        break;
+      }
+
+      default:
+      throw new Error('Unknown type.')
+
+    }
+
+  });
+
+  // Encrypt Button On Click
+  $('#eButton').click(function (e) {
+    start = new Date().getTime();
+    e.preventDefault();
+    buddy.sendQueryMsg();
+  });
+
+  $('#vButton').click(function (e) {
+    e.preventDefault();
+    var smpSecret = prompt('Enter your shared secret');
+    var smpQuestion = prompt('Enter your shared question, leave blank if not needed');
+    buddy.smpSecret(smpSecret, smpQuestion);
+  });
+
+
 });
