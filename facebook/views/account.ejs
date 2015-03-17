@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OTR IM Chat</title>
+     <link rel='stylesheet' href='/stylesheets/style.css' />
+     <link rel='stylesheet' href='/stylesheets/main.css' />
+</head>
+<body>
+
+    <div class="fb-details" style="display:none">
+      <h1>Welcome to Facebook Off the Record Chat</h1>
+    	<p>Hi, you must be <a class="usernameInput" href="<%= user.profileUrl %>"><%= user.displayName %></a>
+    	</p>
+    </div>
+  
+    <li class="chat page">
+      <div class="otrArea">
+        <label id="eState">Unencrypted</label>
+        <button id="eButton">Encrypt</button>
+        <button id="ueButton" style="display:none">Unencrypt</button>
+        <label id="vState">Unverified</label>
+        <button id="vButton">Verify</button>
+        <a href="/logout">logout</a>
+      </div>
+      <div class="chatArea">
+        <ul class="messages"></ul>
+      </div>
+      <input class="inputMessage" placeholder="Type here..."/>
+    </li>
+    
+  </ul>
+
+  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/main.js"></script>
+
+  <!-- Load dependencies -->
+  <script src="build/dep/salsa20.js"></script>
+  <script src="build/dep/bigint.js"></script>
+  <script src="build/dep/crypto.js"></script>
+  <script src="build/dep/eventemitter.js"></script>
+
+  <!-- Load otr.js or otr.min.js -->
+  <script src="build/otr.js"></script>
+</body>
+</html>
