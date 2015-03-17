@@ -29,13 +29,28 @@ $(
   var socket = io('http://localhost:3000');
 
   // OTR Messaging
-  var buddy = new OTR();
+  var options = {
+      fragment_size: 140
+    , send_interval: 200
+    , priv: getDSAKey()
+  }
+
+  var buddy = new OTR(options);
   
   var $encryptButton = $('#eButton');
   var $encryptionState = $('#eState');
   var $verifyButton = $('#vButton');
   var $verifyState = $('#vState');
 
+  function getDSAKey()
+  {
+    var start = new Date().getTime();
+    var myKey = new DSA();
+    var end = new Date().getTime();
+    time = end - start;
+    log('DSA took ' + (time) + ' ms ');
+    return myKey;
+  }
   // Sets the client's username
   function setUsername () {
     username = $usernameInput.val().trim();
@@ -165,6 +180,8 @@ var them = ''
    // addParticipantsMessage(data);
   });
 
+
+
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
       console.log('incoming', data);
@@ -218,6 +235,14 @@ var them = ''
       $('#eState').text(buddy.msgstate);
       $('#ueButton').hide();
       $('#eButton').show();
+
+      time = (new Date()).getTime() - start;
+    
+      if(time < 10000)  
+        log('decryption took '+ (time) + 'ms');
+      
+      log('message state is ' + (buddy.msgstate ? 'encrypted' : 'decrypted' ));
+    
     }
 
   });
@@ -261,7 +286,6 @@ var them = ''
     start = new Date().getTime();
     e.preventDefault();
     buddy.endOtr(function() {log('otr has ended');});
-
   });
 
   $('#vButton').click(function (e) {

@@ -9,12 +9,17 @@
     
     <li class="chat page">
       <div class="otrArea">
-        <label id="eState">Unencrypted</label>
+        <br/>
+        <br/>
+        <label>SEC-CHAT</label><br/><br/>
+        <label id="eState">Unencrypted</label><br/>
         <button id="eButton">Encrypt</button>
         <button id="ueButton" style="display:none">Unencrypt</button>
-
-        <label id="vState">Unverified</label>
-        <button id="vButton">Verify</button>
+        <br/>
+        <br/>
+        <br/>
+        <label id="vState">Unverified</label><br/>
+        <button id="vButton">Verify</button><br/>
       </div>
       <div class="chatArea">
         <ul class="messages"></ul>
@@ -32,7 +37,7 @@
   </ul>
 
   <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-  <script src="/socket.io.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
   <script src="js/main.js"></script>
 
   <!-- Load dependencies -->

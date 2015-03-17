@@ -151,5 +151,16 @@ ul {
 
 /* OTR Area */
 .otrArea{
-  
+  position: fixed;
+  right: 0;
+  top: 5%;
+  height: 100%;
+  width: 11em;
+  margin-top: -2.5em;
+  background-color: #434343;
+  color: #fff;
+  padding: 10px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  font-family: Courier New;
 }
