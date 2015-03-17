@@ -11,6 +11,7 @@
       <div class="otrArea">
         <label id="eState">Unencrypted</label>
         <button id="eButton">Encrypt</button>
+        <button id="ueButton" style="display:none">Unencrypt</button>
 
         <label id="vState">Unverified</label>
         <button id="vButton">Verify</button>
@@ -23,6 +24,7 @@
     
     <li class="login page">
       <div class="form">
+          <h3 class="title">Welcome to SecChat!</h3>
         <h3 class="title">What's your nickname?</h3>
         <input class="usernameInput" type="text" maxlength="14" />
       </div>
@@ -30,7 +32,7 @@
   </ul>
 
   <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
+  <script src="/socket.io.js"></script>
   <script src="js/main.js"></script>
 
   <!-- Load dependencies -->

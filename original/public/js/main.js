@@ -152,6 +152,7 @@ $(
 
 
   // Socket events
+var them = ''
 
   // Whenever the server emits 'login', log the login message
   socket.on('login', function (data) {
@@ -167,7 +168,7 @@ $(
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
       console.log('incoming', data);
-      addChatMessage(data);
+      them = data.username;
       buddy.receiveMsg(data.message);
   });
 
@@ -185,6 +186,11 @@ $(
   // Buddy Events
   buddy.on('ui', function (msg, encrypted) {
     console.log("Msg is ",msg);
+    data = {};
+    data.username = them;
+    data.message = msg;
+    addChatMessage(data);
+
   });
 
   buddy.on('io', function (msg) {
@@ -195,13 +201,23 @@ $(
   buddy.on('status', function (state) {
     
     if (state === OTR.CONST.STATUS_AKE_SUCCESS) {
-    log('ake took ' + ((new Date()).getTime() - start) + 'ms ');
-    log('<br />message state is ' + (buddy.msgstate ? 'encrypted' : 'plaintext' ) + '</strong>');
+    
+    time = (new Date()).getTime() - start;
+    
+    $('#eButton').hide();
+    $('#ueButton').show();
+    
+    if(time < 10000)
+      log('ake took ' + (time) + ' ms ');
+    
+    log('message state is ' + (buddy.msgstate ? 'encrypted' : 'plaintext' ));
     $('#eState').text(buddy.msgstate);
     }
 
     if(state  == OTR.CONST.STATUS_END_OTR){
-      log('ake has ended');
+      $('#eState').text(buddy.msgstate);
+      $('#ueButton').hide();
+      $('#eButton').show();
     }
 
   });
@@ -238,6 +254,14 @@ $(
     start = new Date().getTime();
     e.preventDefault();
     buddy.sendQueryMsg();
+
+  });
+
+  $('#ueButton').click(function (e) {
+    start = new Date().getTime();
+    e.preventDefault();
+    buddy.endOtr(function() {log('otr has ended');});
+
   });
 
   $('#vButton').click(function (e) {
