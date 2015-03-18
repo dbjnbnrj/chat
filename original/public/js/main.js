@@ -229,6 +229,10 @@ var them = ''
     
     log('message state is ' + (buddy.msgstate ? 'encrypted' : 'plaintext' ));
     $('#eState').text(buddy.msgstate);
+
+    $('#fprint').text(buddy.priv.fingerprint());
+    $('#tprint').text(buddy.their_priv_pk.fingerprint());
+
     }
 
     if(state  == OTR.CONST.STATUS_END_OTR){
@@ -242,6 +246,9 @@ var them = ''
         log('decryption took '+ (time) + 'ms');
       
       log('message state is ' + (buddy.msgstate ? 'encrypted' : 'decrypted' ));
+
+      $('#fprint').text('');
+      $('#tprint').text('');
     
     }
 
